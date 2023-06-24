@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>random graph</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+
+<body>
+  <div class="container-fluid m-0 row col-12 text-center justify-content-center ">
+    <div class="col-10 border-bottom border-black">
+      <h2 class="text-success">This is just random chart changing as realtime app using django channels .</h2>
+    </div>
+    <div class="container row col-10 d-flex mt-5">
+      <div class="col-12 bg-body-secondary">
+        <canvas id="myChart" width="400" height="175" aria-label="Hello ARIA World" role="img"></canvas>
+      </div>
+      <div class="col-12 mt-4">
+        <button type="button" class="btn btn-dark col-4 " onclick="start()">START</button>
+      </div>
+    </div>
+
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    const ctx = document.getElementById('myChart');
+
+    let obj = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: ["Tokyo", "New York City", "London", "Paris", "Beijing", "Sydney", "Moscow", "Rio de Janeiro", "Cairo", "Mumbai", "Berlin", "Istanbul", "Vancouver", "Cape Town", "Buenos Aires"],
+        datasets: [{
+          label: 'sales',
+          data: [10, 5, 23, 17, 2, 8, 12, 19, 4, 0, 13, 21, 9, 16, 22],
+          fill: true,
+          borderColor: 'rgb(75, 192, 192)',
+          tension: 0.1
+        }]
+      },
+      options: {
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        }
+      }
+    });
+    function start() {
+      var socket = new WebSocket('ws://localhost:8000/ws/start/');
+      var newdata = obj.data.datasets[0].data
+      socket.onmessage = function (event) {
+        var nextdata = JSON.parse(event.data);
+        console.log(nextdata);
+        newdata.shift()
+        newdata.push(parseInt(newdata))
+        obj.data.datasets[0].data = newdata
+        obj.update()
+      }
+    }
+
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+</body>
+
+</html>
