@@ -1,13 +1,14 @@
-from  channels.generic.websocket import WebsocketConsumer
+from  channels.generic.websocket import AsyncWebsocketConsumer
 import json
 from  random import randint
-from time import sleep
+from asyncio import sleep
 
 
-class WSconsumer(WebsocketConsumer):
 
-    def connect(self):
-        self.accept()
+class WSconsumer(AsyncWebsocketConsumer):
+
+    async def connect(self):
+        await self.accept()
         for i in range(100):
-            self.send(json.dumps( {"message": randint(1,30)} ))
-            sleep(1)
+            await self.send(json.dumps( {"message": randint(1,30)} ))
+            await sleep(1)
